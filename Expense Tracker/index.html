@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BudgetFlow — Expense Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="screen-setup" class="screen active">
+    <div class="setup-card">
+
+      <div class="setup-logo">
+        <div class="logo-mark">💰</div>
+        <span>BudgetFlow</span>
+      </div>
+
+      <h1 class="setup-title">Set Your Budget</h1>
+      <p class="setup-sub">Choose your currency, enter your total budget, and start tracking expenses in real time.</p>
+
+      <div class="setup-fields">
+        <label class="field-label">Currency</label>
+        <select id="currency-select" class="field-input">
+          <option value="PKR" data-sym="Rs">🇵🇰 PKR — Pakistani Rupee</option>
+          <option value="USD" data-sym="$">🇺🇸 USD — US Dollar</option>
+          <option value="EUR" data-sym="€">🇪🇺 EUR — Euro</option>
+          <option value="GBP" data-sym="£">🇬🇧 GBP — British Pound</option>
+          <option value="AED" data-sym="د.إ">🇦🇪 AED — UAE Dirham</option>
+          <option value="SAR" data-sym="﷼">🇸🇦 SAR — Saudi Riyal</option>
+          <option value="INR" data-sym="₹">🇮🇳 INR — Indian Rupee</option>
+        </select>
+
+        <label class="field-label">Total Budget</label>
+        <input id="budget-input" class="field-input" type="number" placeholder="e.g. 50000" min="1" />
+
+        <div class="quick-row">
+          <span class="quick-label">Quick amounts:</span>
+          <div class="quick-chips">
+            <button class="chip" onclick="setQuick(10000)">10K</button>
+            <button class="chip" onclick="setQuick(25000)">25K</button>
+            <button class="chip" onclick="setQuick(50000)">50K</button>
+            <button class="chip" onclick="setQuick(100000)">1 Lac</button>
+            <button class="chip" onclick="setQuick(500000)">5 Lac</button>
+          </div>
+        </div>
+
+        <button class="btn-start" onclick="startTracking()">Start Tracking →</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="screen-dashboard" class="screen">
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-logo">
+        <div class="logo-mark small">💰</div>
+        <span>BudgetFlow</span>
+      </div>
+      <div class="nav-right">
+        <span id="nav-date" class="nav-date"></span>
+        <button class="btn-reset" onclick="resetBudget()">↩ Reset</button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard">
+
+      <!-- ── SUMMARY CARDS ── -->
+      <section class="summary-row">
+        <div class="summary-card card-budget">
+          <div class="sc-icon">🏦</div>
+          <div class="sc-body">
+            <div class="sc-label">Total Budget</div>
+            <div class="sc-value" id="s-budget">—</div>
+          </div>
+        </div>
+        <div class="summary-card card-spent">
+          <div class="sc-icon">💳</div>
+          <div class="sc-body">
+            <div class="sc-label">Total Spent</div>
+            <div class="sc-value" id="s-spent">0</div>
+          </div>
+        </div>
+        <div class="summary-card card-remaining">
+          <div class="sc-icon">✅</div>
+          <div class="sc-body">
+            <div class="sc-label">Remaining</div>
+            <div class="sc-value" id="s-remaining">—</div>
+          </div>
+        </div>
+        <div class="summary-card card-items">
+          <div class="sc-icon">📦</div>
+          <div class="sc-body">
+            <div class="sc-label">No. of Items</div>
+            <div class="sc-value" id="s-items">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── PROGRESS BAR ── -->
+      <section class="progress-section">
+        <div class="progress-top">
+          <span class="progress-title">Budget Used</span>
+          <span class="progress-pct" id="prog-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar" id="prog-bar"></div>
+        </div>
+        <div class="progress-labels">
+          <span>Rs 0</span>
+          <span id="prog-budget-label">—</span>
+        </div>
+      </section>
+
+      <div class="two-col">
+
+        <div class="col-left">
+
+          <div class="card form-card">
+            <div class="card-head">
+              <h2 class="card-title">➕ Add Expense</h2>
+            </div>
+            <div class="card-body">
+
+              <div class="form-grid">
+                <div class="fg-full">
+                  <label class="field-label">Item Name</label>
+                  <input id="item-name" class="field-input" type="text" placeholder="e.g. Groceries, Electricity bill…" />
+                </div>
+                <div>
+                  <label class="field-label">Category</label>
+                  <select id="item-cat" class="field-input">
+                    <option value="food">🍔 Food & Dining</option>
+                    <option value="transport">🚗 Transport</option>
+                    <option value="shopping">🛍️ Shopping</option>
+                    <option value="health">💊 Health</option>
+                    <option value="bills">⚡ Bills & Utilities</option>
+                    <option value="education">📚 Education</option>
+                    <option value="entertainment">🎮 Entertainment</option>
+                    <option value="other">📦 Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label">Priority</label>
+                  <select id="item-priority" class="field-input">
+                    <option value="high">🔴 High</option>
+                    <option value="medium" selected>🟡 Medium</option>
+                    <option value="low">🟢 Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label">Amount (<span id="curr-sym-label">Rs</span>)</label>
+                  <input id="item-amount" class="field-input" type="number" placeholder="0" min="0" />
+                </div>
+                <div>
+                  <label class="field-label">Quantity</label>
+                  <input id="item-qty" class="field-input" type="number" value="1" min="1" max="999" />
+                </div>
+              </div>
+
+              <button class="btn-add" id="btn-add" onclick="addItem()">➕ Add Expense</button>
+              <button class="btn-cancel-edit" id="btn-cancel" onclick="cancelEdit()" style="display:none">✕ Cancel Edit</button>
+
+            </div>
+          </div>
+
+          <!-- Expense List -->
+          <div class="card list-card">
+            <div class="card-head">
+              <h2 class="card-title">📋 Expense List</h2>
+              <div class="list-controls">
+                <select class="mini-select" id="sort-select" onchange="renderItems()">
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="high">Highest</option>
+                  <option value="low">Lowest</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="cat-filters" id="cat-filters">
+              <button class="cat-btn active" data-cat="all" onclick="filterCat(this)">All</button>
+              <button class="cat-btn" data-cat="food" onclick="filterCat(this)">🍔 Food</button>
+              <button class="cat-btn" data-cat="transport" onclick="filterCat(this)">🚗 Transport</button>
+              <button class="cat-btn" data-cat="shopping" onclick="filterCat(this)">🛍️ Shopping</button>
+              <button class="cat-btn" data-cat="health" onclick="filterCat(this)">💊 Health</button>
+              <button class="cat-btn" data-cat="bills" onclick="filterCat(this)">⚡ Bills</button>
+              <button class="cat-btn" data-cat="education" onclick="filterCat(this)">📚 Education</button>
+              <button class="cat-btn" data-cat="entertainment" onclick="filterCat(this)">🎮 Fun</button>
+              <button class="cat-btn" data-cat="other" onclick="filterCat(this)">📦 Other</button>
+            </div>
+
+            <div class="card-body" id="items-container">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-right">
+          <div class="card">
+            <div class="card-head">
+              <h2 class="card-title">📊 Spending Breakdown</h2>
+            </div>
+            <div class="card-body" id="breakdown-container">
+              <p class="empty-text">Add expenses to see a breakdown by category.</p>
+            </div>
+          </div>
+
+          <!-- Top Expense -->
+          <div class="card tip-card">
+            <div class="card-head">
+              <h2 class="card-title">💡 Smart Tip</h2>
+            </div>
+            <div class="card-body">
+              <p id="tip-text" class="tip-text">Add expenses and we'll show personalized budget tips here.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast-area"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

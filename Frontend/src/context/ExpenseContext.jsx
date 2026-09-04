@@ -80,7 +80,7 @@ export function ExpenseProvider({ children }) {
     () => transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.total, 0),
     [transactions]
   );
-  const remaining = budget + totalIncome - totalExpense;
+  const remaining = budget - totalExpense;
   const usedPct = budget > 0 ? Math.min((totalExpense / budget) * 100, 100) : 0;
 
   async function setupBudget({ amount, currency, symbol }) {
@@ -118,12 +118,10 @@ export function ExpenseProvider({ children }) {
     if (editingId !== null) {
       const old = transactions.find((t) => t.id === editingId);
       const expenseWithoutOld = totalExpense - (old && old.type === 'expense' ? old.total : 0);
-      const incomeWithoutOld = totalIncome - (old && old.type === 'income' ? old.total : 0);
       const newExpense = expenseWithoutOld + (type === 'expense' ? total : 0);
-      const newIncome = incomeWithoutOld + (type === 'income' ? total : 0);
-
-      if (budget + newIncome - newExpense < 0) {
-        showToast(`This would exceed your remaining budget of ${fmt(budget + incomeWithoutOld - expenseWithoutOld)}.`, 'error');
+    
+      if (budget - newExpense < 0) {
+        showToast(`This would exceed your remaining budget of ${fmt(budget - expenseWithoutOld)}.`, 'error');
         return false;
       }
 
@@ -148,7 +146,7 @@ export function ExpenseProvider({ children }) {
       }
     }
 
-    if (type === 'expense' && totalExpense + total > budget + totalIncome) {
+    if (type === 'expense' && totalExpense + total > budget) {
       showToast(`This exceeds your remaining budget of ${fmt(remaining)}.`, 'error');
       return false;
     }

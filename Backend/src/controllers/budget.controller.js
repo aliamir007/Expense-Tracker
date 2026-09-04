@@ -5,7 +5,7 @@ const getBudget = async (req, res, next) => {
         const user = await User.findById(req.userId).select('budget currency');
 
         if (!user) {
-            return res.status(404).json({
+            return res.status(401).json({
                 success: false,
                 message: "User not found"
             });
@@ -45,7 +45,7 @@ const updateBudget = async (req, res, next) => {
         ).select('budget currency');
 
         if (!user) {
-            return res.status(404).json({
+            return res.status(401).json({
                 success: false,
                 message: "User not found"
             });
